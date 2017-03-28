@@ -11,7 +11,7 @@ module Dag
       source = self::EndPoint.from(ancestor)
       sink = self::EndPoint.from(descendant)
       conditions = self.conditions_for(source, sink)
-      path = self.new(conditions)
+      path = self.new(conditions, options = {})
       path.make_direct
       path
     end
