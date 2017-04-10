@@ -8,7 +8,6 @@ module Dag
     #Class methods that extend the link model for both polymorphic and non-polymorphic graphs
     #Returns a new edge between two points
     def build_edge(ancestor, descendant, options = {})
-      puts 'Coucouc mon ami'
       source = self::EndPoint.from(ancestor)
       sink = self::EndPoint.from(descendant)
       conditions = self.conditions_for(source, sink)
@@ -36,14 +35,14 @@ module Dag
     def find_or_build_edge(ancestor, descendant, options = {})
       edge = self.find_edge(ancestor, descendant)
       return edge unless edge.nil?
-      return build_edge(ancestor, descendant, options = {})
+      return build_edge(ancestor, descendant, options)
     end
 
     #Creates an edge between two points using save
     def create_edge(ancestor, descendant, options = {})
       link = self.find_link(ancestor, descendant)
       if link.nil?
-        edge = self.build_edge(ancestor, descendant, options = {})
+        edge = self.build_edge(ancestor, descendant, options)
         return edge.save
       else
         link.make_direct
@@ -55,7 +54,7 @@ module Dag
     def create_edge!(ancestor, descendant, options = {})
       link = self.find_link(ancestor, descendant)
       if link.nil?
-        edge = self.build_edge(ancestor, descendant, options = {})
+        edge = self.build_edge(ancestor, descendant, options)
         edge.save!
         edge
       else
