@@ -8,7 +8,7 @@ module Dag
     #Class methods that extend the link model for both polymorphic and non-polymorphic graphs
     #Returns a new edge between two points
     def build_edge(ancestor, descendant, options = {})
-      caca = caca
+      puts 'Coucouc mon ami'
       source = self::EndPoint.from(ancestor)
       sink = self::EndPoint.from(descendant)
       conditions = self.conditions_for(source, sink)
