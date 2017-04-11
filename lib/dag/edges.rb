@@ -228,6 +228,11 @@ module Dag
       def push_associated_modification!(edge)
         raise ActiveRecord::ActiveRecordError, 'ERROR: cannot modify our self in this way' if edge == self
         edge.do_not_perpetuate = true
+        edge.instance_id = self.instance_id
+        edge.meta_knowledge_graph_id = self.meta_knowledge_graph_id
+        edge.knowledge_graph_id = self.knowledge_graph_id
+        edge.kg_initial = self.kg_initial
+        
         if edge.count == 0
           edge.destroy
         else
