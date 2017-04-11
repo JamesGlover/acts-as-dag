@@ -228,10 +228,6 @@ module Dag
       def push_associated_modification!(edge)
         raise ActiveRecord::ActiveRecordError, 'ERROR: cannot modify our self in this way' if edge == self
         edge.do_not_perpetuate = true
-        edge.instance_id = self.instance_id
-        edge.meta_knowledge_graph_id = self.meta_knowledge_graph_id
-        edge.knowledge_graph_id = self.knowledge_graph_id
-        edge.kg_initial = self.kg_initial
         
         if edge.count == 0
           edge.destroy
@@ -266,7 +262,7 @@ module Dag
         sink = below_leg.sink
         bridging_leg = self.class.find_link(source, sink)
         if bridging_leg.nil?
-          bridging_leg = self.class.new(self.class.conditions_for(source, sink))
+          bridging_leg = self.dup.assign_attributes(self.class.conditions_for(source, sink))
           bridging_leg.make_indirect
           bridging_leg.internal_count = 0
         end
