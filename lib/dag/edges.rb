@@ -262,7 +262,8 @@ module Dag
         sink = below_leg.sink
         bridging_leg = self.class.find_link(source, sink)
         if bridging_leg.nil?
-          bridging_leg = self.dup.assign_attributes(self.class.conditions_for(source, sink))
+          bridging_leg = self.dup
+          bridging_leg.assign_attributes(self.class.conditions_for(source, sink))
           bridging_leg.make_indirect
           bridging_leg.internal_count = 0
         end
