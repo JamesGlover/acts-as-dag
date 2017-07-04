@@ -328,8 +328,12 @@ module Dag
           #puts "below_bridging_leg" + below_bridging_leg.inspect
 
           self.push_associated_modification!(below_bridging_leg)
+          
+          puts "###################_ above_brdgin_legs" 
+          puts "above_bridging_legs" + above_bridging_legs.inspect
+
           above_bridging_legs.each do |above_bridging_leg|
-          puts "above_bridging_leg" + above_bridging_leg.inspect
+            puts "above_bridging_leg" + above_bridging_leg.inspect
 
             long_leg = self.rewire_crossing(above_bridging_leg, below_leg)
             puts "long_leg" + long_leg.inspect
