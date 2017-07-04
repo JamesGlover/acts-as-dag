@@ -283,6 +283,7 @@ module Dag
         self.links_from_sink.each do |edge|
           below_sinks << edge.sink
         end
+        puts "below_sinks" + below_sinks.inspect
         above_bridging_legs = []
         #everything above me tied to my sink
         above_sources.each do |above_source|
@@ -290,14 +291,26 @@ module Dag
           above_bridging_leg = self.rewire_crossing(above_leg, self)
           above_bridging_legs << above_bridging_leg unless above_bridging_leg.nil?
         end
+        puts "above_bridging_legs" + above_bridging_legs.inspect
 
         #everything beneath me tied to my source
+        puts "dans la boucle" 
+
         below_sinks.each do |below_sink|
+          puts "below_sink" + below_sinks.inspect
+
           below_leg = self.class.find_link(sink, below_sink)
+          puts "below_leg" + below_sinks.inspect
+
           below_bridging_leg = self.rewire_crossing(self, below_leg)
+          puts "below_bridging_leg" + below_bridging_leg.inspect
+
           self.push_associated_modification!(below_bridging_leg)
           above_bridging_legs.each do |above_bridging_leg|
+          puts "above_bridging_leg" + above_bridging_leg.inspect
+
             long_leg = self.rewire_crossing(above_bridging_leg, below_leg)
+            puts "long_leg" + long_leg.inspect
             self.push_associated_modification!(long_leg)
           end
         end
