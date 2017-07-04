@@ -279,6 +279,8 @@ module Dag
         self.links_to_source.each do |edge|
           above_sources << edge.source
         end
+        puts "above_sources" + above_sources.inspect
+
         below_sinks = []
         self.links_from_sink.each do |edge|
           below_sinks << edge.sink
@@ -318,6 +320,8 @@ module Dag
           self.push_associated_modification!(above_bridging_leg)
         end
       end
+      puts "Fin" 
+
     end
 
   end
