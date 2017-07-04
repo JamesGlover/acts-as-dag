@@ -279,7 +279,7 @@ module Dag
         self.links_to_source.each do |edge|
           above_sources << edge.source
         end
-        puts "above_sources" + above_sources.inspect
+        #puts "above_sources" + above_sources.inspect
 
         below_sinks = []
         self.links_from_sink.each do |edge|
@@ -291,15 +291,15 @@ module Dag
         puts "everything above me tied to my sink"
         above_sources.each do |above_source|
           above_leg = self.class.find_link(above_source, source)
-          puts "above_leg" + above_leg.inspect
+          #puts "above_leg" + above_leg.inspect
 
           above_bridging_leg = self.rewire_crossing(above_leg, self)
           above_bridging_legs << above_bridging_leg unless above_bridging_leg.nil?
         end
-        puts "above_bridging_legs" + above_bridging_legs.inspect
+        #puts "above_bridging_legs" + above_bridging_legs.inspect
 
         #everything beneath me tied to my source
-        puts "dans la boucle" 
+        puts "everything beneath me tied to my source" 
 
         below_sinks.each do |below_sink|
           puts "below_sink" + below_sinks.inspect
