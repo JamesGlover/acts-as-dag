@@ -238,7 +238,9 @@ module Dag
 
       #Updates the wiring of edges that dependent on the current one
       def rewire_crossing(above_leg, below_leg)
+        puts "rewire_crossing"
         if above_leg.count_changed?
+          puts "count_changed"
           was = above_leg.count_was
           was = 0 if was.nil?
           above_leg_count = above_leg.count - was
@@ -248,6 +250,7 @@ module Dag
             below_leg_count = below_leg.count
           end
         else
+          puts "not count_changed"
           above_leg_count = above_leg.count
           if below_leg.count_changed?
             was = below_leg.count_was
@@ -257,10 +260,19 @@ module Dag
             raise ActiveRecord::ActiveRecordError, 'ERROR: both legs cannot have count changes'
           end
         end
+        puts "above_leg_count", above_leg_count.inspect
+        puts "below_leg_count", below_leg_count.inspect
+
         count = above_leg_count * below_leg_count
         source = above_leg.source
         sink = below_leg.sink
+        
+        puts "source", source.inspect
+        puts "sink", sink.inspect
+
         bridging_leg = self.class.find_link(source, sink)
+        puts "bridging_leg", bridging_leg.inspect
+
         if bridging_leg.nil?
           bridging_leg = self.dup
           bridging_leg.assign_attributes(self.class.conditions_for(source, sink))
@@ -268,6 +280,9 @@ module Dag
           bridging_leg.internal_count = 0
         end
         bridging_leg.internal_count = bridging_leg.count + count
+        
+        puts "bridging_leg after modif", bridging_leg.inspect
+
         bridging_leg
       end
 
@@ -302,13 +317,13 @@ module Dag
         puts "everything beneath me tied to my source" 
 
         below_sinks.each do |below_sink|
-          puts "below_sink" + below_sinks.inspect
+          #puts "below_sink" + below_sinks.inspect
 
           below_leg = self.class.find_link(sink, below_sink)
           puts "below_leg" + below_leg.inspect
 
           below_bridging_leg = self.rewire_crossing(self, below_leg)
-          puts "below_bridging_leg" + below_bridging_leg.inspect
+          #puts "below_bridging_leg" + below_bridging_leg.inspect
 
           self.push_associated_modification!(below_bridging_leg)
           above_bridging_legs.each do |above_bridging_leg|
