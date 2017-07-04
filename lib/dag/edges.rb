@@ -270,6 +270,8 @@ module Dag
         puts "source", source.inspect
         puts "sink", sink.inspect
 
+        byebug
+        
         bridging_leg = self.class.find_link(source, sink)
         puts "bridging_leg", bridging_leg.inspect
 
