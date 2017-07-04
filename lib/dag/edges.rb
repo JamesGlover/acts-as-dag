@@ -305,7 +305,7 @@ module Dag
           puts "below_sink" + below_sinks.inspect
 
           below_leg = self.class.find_link(sink, below_sink)
-          puts "below_leg" + below_sinks.inspect
+          puts "below_leg" + below_leg.inspect
 
           below_bridging_leg = self.rewire_crossing(self, below_leg)
           puts "below_bridging_leg" + below_bridging_leg.inspect
