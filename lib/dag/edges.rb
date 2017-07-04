@@ -288,8 +288,11 @@ module Dag
         puts "below_sinks" + below_sinks.inspect
         above_bridging_legs = []
         #everything above me tied to my sink
+        puts "everything above me tied to my sink"
         above_sources.each do |above_source|
           above_leg = self.class.find_link(above_source, source)
+          puts "above_leg" + above_leg.inspect
+
           above_bridging_leg = self.rewire_crossing(above_leg, self)
           above_bridging_legs << above_bridging_leg unless above_bridging_leg.nil?
         end
