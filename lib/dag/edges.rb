@@ -273,9 +273,6 @@ module Dag
           bridging_leg.internal_count = 0
         end
         bridging_leg.internal_count = bridging_leg.count + count
-        
-        puts "bridging_leg after modif", bridging_leg.inspect
-
         bridging_leg
       end
 
@@ -292,11 +289,9 @@ module Dag
         self.links_from_sink.each do |edge|
           below_sinks << edge.sink
         end
-        puts "below_sinks" + below_sinks.inspect
         above_bridging_legs = []
         
         #everything above me tied to my sink
-        puts "everything above me tied to my sink"
         above_sources.each do |above_source|
           above_leg = self.class.find_link(above_source, source)
           above_bridging_leg = self.rewire_crossing(above_leg, self)
@@ -307,8 +302,7 @@ module Dag
         below_sinks.each do |below_sink|
           below_leg = self.class.find_link(sink, below_sink)
           below_bridging_leg = self.rewire_crossing(self, below_leg)
-          #puts "below_bridging_leg" + below_bridging_leg.inspect
-
+          
           self.push_associated_modification!(below_bridging_leg)
          
           above_bridging_legs.each do |above_bridging_leg|
