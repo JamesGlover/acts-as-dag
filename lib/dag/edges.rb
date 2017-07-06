@@ -238,9 +238,7 @@ module Dag
 
       #Updates the wiring of edges that dependent on the current one
       def rewire_crossing(above_leg, below_leg)
-        puts "rewire_crossing"
         if above_leg.count_changed?
-          puts "count_changed"
           was = above_leg.count_was
           was = 0 if was.nil?
           above_leg_count = above_leg.count - was
@@ -250,7 +248,6 @@ module Dag
             below_leg_count = below_leg.count
           end
         else
-          puts "not count_changed"
           above_leg_count = above_leg.count
           if below_leg.count_changed?
             was = below_leg.count_was
@@ -260,23 +257,17 @@ module Dag
             raise ActiveRecord::ActiveRecordError, 'ERROR: both legs cannot have count changes'
           end
         end
-        puts "above_leg_count", above_leg_count.inspect
-        puts "below_leg_count", below_leg_count.inspect
-
+        
         count = above_leg_count * below_leg_count
         source = above_leg.source
         sink = below_leg.sink
         
-        puts "source", source.inspect
-        puts "sink", sink.inspect
-
-        byebug
-        
         bridging_leg = self.class.find_link(source, sink)
-        puts "bridging_leg", bridging_leg.inspect
-
+        
         if bridging_leg.nil?
-          bridging_leg = self.dup
+          bridging_leg = above_leg.dup # Ceci met source à la bonne valeur
+          bridging_leg.coefficient = nil # éviter l'héritage des attirbuts(notament coefficient) 
+
           bridging_leg.assign_attributes(self.class.conditions_for(source, sink))
           bridging_leg.make_indirect
           bridging_leg.internal_count = 0
@@ -296,47 +287,33 @@ module Dag
         self.links_to_source.each do |edge|
           above_sources << edge.source
         end
-        #puts "above_sources" + above_sources.inspect
-
+        
         below_sinks = []
         self.links_from_sink.each do |edge|
           below_sinks << edge.sink
         end
         puts "below_sinks" + below_sinks.inspect
         above_bridging_legs = []
+        
         #everything above me tied to my sink
         puts "everything above me tied to my sink"
         above_sources.each do |above_source|
           above_leg = self.class.find_link(above_source, source)
-          #puts "above_leg" + above_leg.inspect
-
           above_bridging_leg = self.rewire_crossing(above_leg, self)
           above_bridging_legs << above_bridging_leg unless above_bridging_leg.nil?
         end
-        #puts "above_bridging_legs" + above_bridging_legs.inspect
-
+        
         #everything beneath me tied to my source
-        puts "everything beneath me tied to my source" 
-
         below_sinks.each do |below_sink|
-          #puts "below_sink" + below_sinks.inspect
-
           below_leg = self.class.find_link(sink, below_sink)
-          puts "below_leg" + below_leg.inspect
-
           below_bridging_leg = self.rewire_crossing(self, below_leg)
           #puts "below_bridging_leg" + below_bridging_leg.inspect
 
           self.push_associated_modification!(below_bridging_leg)
-          
-          puts "###################_ above_brdgin_legs" 
-          puts "above_bridging_legs" + above_bridging_legs.inspect
-
+         
           above_bridging_legs.each do |above_bridging_leg|
-            puts "above_bridging_leg" + above_bridging_leg.inspect
-
+         
             long_leg = self.rewire_crossing(above_bridging_leg, below_leg)
-            puts "long_leg" + long_leg.inspect
             self.push_associated_modification!(long_leg)
           end
         end
@@ -344,8 +321,6 @@ module Dag
           self.push_associated_modification!(above_bridging_leg)
         end
       end
-      puts "Fin" 
-
     end
 
   end
