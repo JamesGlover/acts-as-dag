@@ -266,8 +266,7 @@ module Dag
         
         if bridging_leg.nil?
           bridging_leg = above_leg.dup # Ceci met source à la bonne valeur
-          bridging_leg.coefficient = nil # éviter l'héritage des attirbuts(notament coefficient) 
-
+          
           bridging_leg.assign_attributes(self.class.conditions_for(source, sink))
           bridging_leg.make_indirect
           bridging_leg.internal_count = 0
