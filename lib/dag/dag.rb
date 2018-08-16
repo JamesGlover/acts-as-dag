@@ -10,7 +10,8 @@ module Dag
             :direct_column => 'direct',
             :count_column => 'count',
             :polymorphic => false,
-            :node_class_name => nil}
+            :node_class_name => nil,
+            :strict_mode => true}
     conf.update(options)
 
     unless conf[:polymorphic]
@@ -24,6 +25,10 @@ module Dag
 
     extend Columns
     include Columns
+
+    define_method(:strict_mode?) do
+      self.acts_as_dag_options[:strict_mode]
+    end
 
     #access to _changed? and _was for (edge,count) if not default
     unless direct_column_name == 'direct'
@@ -65,9 +70,9 @@ module Dag
       belongs_to :ancestor, :polymorphic => true
       belongs_to :descendant, :polymorphic => true
 
-      validates ancestor_type_column_name.to_sym, :presence => true
-      validates descendant_type_column_name.to_sym, :presence => true
-      validates ancestor_id_column_name.to_sym, :uniqueness => {:scope => [ancestor_type_column_name, descendant_type_column_name, descendant_id_column_name]}
+      validates ancestor_type_column_name.to_sym, :presence => true, if: :strict_mode?
+      validates descendant_type_column_name.to_sym, :presence => true, if: :strict_mode?
+      validates ancestor_id_column_name.to_sym, :uniqueness => {:scope => [ancestor_type_column_name, descendant_type_column_name, descendant_id_column_name]}, if: :strict_mode?
 
       scope :with_ancestor, lambda { |ancestor| where(ancestor_id_column_name => ancestor.id, ancestor_type_column_name => ancestor.class.to_s) }
       scope :with_descendant, lambda { |descendant| where(descendant_id_column_name => descendant.id, descendant_type_column_name => descendant.class.to_s) }
@@ -81,7 +86,7 @@ module Dag
       belongs_to :ancestor, :foreign_key => ancestor_id_column_name, :class_name => acts_as_dag_options[:node_class_name]
       belongs_to :descendant, :foreign_key => descendant_id_column_name, :class_name => acts_as_dag_options[:node_class_name]
 
-      validates ancestor_id_column_name.to_sym, :uniqueness => {:scope => [descendant_id_column_name]}
+      validates ancestor_id_column_name.to_sym, :uniqueness => {:scope => [descendant_id_column_name]}, :if => :strict_mode?
 
       scope :with_ancestor, lambda { |ancestor| where(ancestor_id_column_name => ancestor.id) }
       scope :with_descendant, lambda { |descendant| where(descendant_id_column_name => descendant.id) }
@@ -99,8 +104,8 @@ module Dag
     scope :ancestor_nodes, lambda { joins(:ancestor) }
     scope :descendant_nodes, lambda { joins(:descendant) }
 
-    validates :ancestor, :presence => true
-    validates :descendant, :presence => true
+    validates :ancestor, :presence => true, :if => :strict_mode?
+    validates :descendant, :presence => true, :if => :strict_mode?
 
     extend Edges
     include Edges
@@ -287,7 +292,7 @@ module Dag
             def #{prefix}self_and_descendants
               [self] + #{prefix}descendants
             end
-            
+
             def #{prefix}leaf?
               self.#{prefix}links_as_ancestor.empty?
 						end

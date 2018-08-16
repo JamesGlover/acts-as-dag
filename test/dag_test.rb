@@ -17,6 +17,12 @@ class Poly < ActiveRecord::Base
   self.table_name = 'poly_edges'
 end
 
+#Used for basic graph link testing
+class Unstrict < ActiveRecord::Base
+  acts_as_dag_links :node_class_name => 'Node', strict_mode: false
+  self.table_name = 'edges'
+end
+
 #Used for redefinition testing
 class Redefiner < ActiveRecord::Base
   acts_as_dag_links :node_class_name => 'Redefiner',
@@ -371,6 +377,14 @@ class DagTest < Minitest::Test
     e2 = Default.create_edge(a, b)
     assert !e2
     assert_raises(ActiveRecord::RecordInvalid) { e3 = Default.create_edge!(a, b) }
+  end
+
+  #Tests that we catch links that would be duplicated on creation
+  def test_no_validation_on_create_duplication_catch_when_not_strict
+    a = Node.create!
+    b = Node.create!
+    e = Unstrict.create_edge(a, b)
+    assert Unstrict.create(ancestor: a, descendant: b)
   end
 
   #Tests that we catch reversed links on creation (cycles)
